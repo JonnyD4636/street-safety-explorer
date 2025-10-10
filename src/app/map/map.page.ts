@@ -6,18 +6,6 @@ import { MapStateService } from '../services/map-state.service';
 import { Crime } from '../services/police-api.service';
 import { Router } from '@angular/router';
 
-// ✅ Robust: import Leaflet’s default marker assets from the package.
-// This bundles them and rewrites to hashed URLs that work on localhost, GitHub Pages, Cloudflare, etc.
-import markerIcon2x from 'leaflet/dist/images/marker-icon-2x.png';
-import markerIcon from 'leaflet/dist/images/marker-icon.png';
-import markerShadow from 'leaflet/dist/images/marker-shadow.png';
-
-L.Icon.Default.mergeOptions({
-  iconRetinaUrl: markerIcon2x,
-  iconUrl: markerIcon,
-  shadowUrl: markerShadow,
-});
-
 @Component({
   selector: 'app-map',
   standalone: true,
@@ -49,13 +37,25 @@ export class MapPage implements AfterViewInit, OnDestroy {
   private map: L.Map | null = null;
   private destroyed = false;
 
+  // --- Leaflet icons using official CDN URLs (guaranteed to load anywhere) ---
+  private static readonly DEFAULT_ICON: L.Icon<L.IconOptions> = L.icon({
+    iconUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon.png',
+    iconRetinaUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon-2x.png',
+    shadowUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-shadow.png',
+    iconSize: [25, 41],
+    iconAnchor: [12, 41],
+    popupAnchor: [1, -34],
+    tooltipAnchor: [16, -28],
+    shadowSize: [41, 41],
+  });
+  // --------------------------------------------------------------------------
+
   ngAfterViewInit() {
     this.crimes = this.mapState.getCrimes();
     if (!this.crimes.length) {
       this.router.navigateByUrl('/home');
       return;
     }
-
     requestAnimationFrame(() => setTimeout(() => this.initMap(), 40));
   }
 
@@ -87,13 +87,15 @@ export class MapPage implements AfterViewInit, OnDestroy {
     }).addTo(this.map);
 
     const pts: L.LatLngExpression[] = [];
+    const icon = MapPage.DEFAULT_ICON;
+
     for (const c of this.crimes) {
       const lat = parseFloat(c.location?.latitude as any);
       const lng = parseFloat(c.location?.longitude as any);
       if (isNaN(lat) || isNaN(lng)) continue;
 
       pts.push([lat, lng]);
-      L.marker([lat, lng])
+      L.marker([lat, lng], { icon })
         .addTo(this.map)
         .bindPopup(`<b>${this.escape(c.category)}</b><br>${this.escape(c.location?.street?.name ?? 'Unknown')}`);
     }

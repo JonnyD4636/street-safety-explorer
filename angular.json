@@ -108,13 +108,15 @@
             "tsConfig": "tsconfig.spec.json",
             "karmaConfig": "karma.conf.js",
             "inlineStyleLanguage": "scss",
-            "assets": [
-              {
-                "glob": "**/*",
-                "input": "src/assets",
-                "output": "assets"
-              }
-            ],
+       "assets": [
+  "src/favicon.ico",
+  "src/assets",
+  {
+    "glob": "**/*",
+    "input": "node_modules/leaflet/dist/images",
+    "output": "assets/leaflet/"
+  }
+],
             "styles": [
               "src/global.scss",
               "src/theme/variables.scss"
