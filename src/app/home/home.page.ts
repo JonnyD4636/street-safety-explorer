@@ -16,10 +16,10 @@ import { MapStateService } from '../services/map-state.service';
 
 function lastFullMonth(): string {
   const d = new Date();
-  d.setMonth(d.getMonth() - 1, 1); 
+  d.setMonth(d.getMonth() - 1, 1);
   const y = d.getFullYear();
   const m = String(d.getMonth() + 1).padStart(2, '0');
-  return `${y}-${m}`; 
+  return `${y}-${m}`;
 }
 
 @Component({
@@ -159,6 +159,13 @@ export class HomePage implements OnInit {
       .map(([name, count]) => ({ name, count }))
       .sort((a, b) => b.count - a.count)
       .slice(0, 8);
+  }
+
+  /** Safe street name extractor to satisfy strict template typing without changing behavior */
+  streetName(c: Crime): string {
+    return (c && (c as any).location && (c as any).location.street && (c as any).location.street.name)
+      ? (c as any).location.street.name
+      : '';
   }
 
   /* ---------- Utils ---------- */

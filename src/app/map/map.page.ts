@@ -6,10 +6,16 @@ import { MapStateService } from '../services/map-state.service';
 import { Crime } from '../services/police-api.service';
 import { Router } from '@angular/router';
 
+// ✅ Robust: import Leaflet’s default marker assets from the package.
+// This bundles them and rewrites to hashed URLs that work on localhost, GitHub Pages, Cloudflare, etc.
+import markerIcon2x from 'leaflet/dist/images/marker-icon-2x.png';
+import markerIcon from 'leaflet/dist/images/marker-icon.png';
+import markerShadow from 'leaflet/dist/images/marker-shadow.png';
+
 L.Icon.Default.mergeOptions({
-  iconRetinaUrl: "assets/leaflet/marker-icon-2x.png",
-  iconUrl: "assets/leaflet/marker-icon.png",
-  shadowUrl: "assets/leaflet/marker-shadow.png",
+  iconRetinaUrl: markerIcon2x,
+  iconUrl: markerIcon,
+  shadowUrl: markerShadow,
 });
 
 @Component({
@@ -71,7 +77,7 @@ export class MapPage implements AfterViewInit, OnDestroy {
     const startLng = first ? parseFloat(first.location!.longitude as any) : -0.1278;
 
     this.map = L.map(container, {
-      preferCanvas: true,        
+      preferCanvas: true,
       zoomControl: true,
       attributionControl: true,
     }).setView([startLat, startLng], 13);
@@ -103,7 +109,6 @@ export class MapPage implements AfterViewInit, OnDestroy {
     this.destroyed = true;
     try { this.map?.remove(); } catch {}
     this.map = null;
-
   }
 
   private escape(v: any): string {

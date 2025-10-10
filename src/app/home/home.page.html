@@ -47,12 +47,10 @@
         </ion-select>
       </ion-item>
 
-      <!-- Month (inline, right-aligned like other values) -->
+      <!-- Month -->
       <ion-item *ngIf="selectedNeighbourhoodId">
         <ion-label>Month</ion-label>
         <ion-datetime-button
-     
-   
           class="month-btn"
           datetime="monthPicker"
           aria-label="Choose month">
@@ -63,7 +61,6 @@
       <ion-modal [keepContentsMounted]="true">
         <ng-template>
           <ion-datetime
-            
             id="monthPicker"
             presentation="month-year"
             [value]="monthIsoValue"
@@ -107,7 +104,8 @@
           <ion-label>
             <div class="result-row">
               <ion-chip size="small">{{ c.category | titlecase }}</ion-chip>
-              <h3 class="street">{{ c.location?.street?.name }}</h3>
+              <!-- CHANGED: use helper to satisfy strict typing -->
+              <h3 class="street">{{ streetName(c) }}</h3>
             </div>
             <p class="sub">
               {{ c.month }}

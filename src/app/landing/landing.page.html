@@ -1,5 +1,4 @@
 <ion-content class="landing tactical" fullscreen>
-
   <main class="hero">
     <img
       src="assets/logo.png"
@@ -8,30 +7,24 @@
       decoding="async"
       fetchpriority="high"
     />
-
     <h1 class="title">Street Safety Explorer</h1>
     <h2 class="subtitle">Explore official UK Police data</h2>
-
     <p class="blurb">
       Select a police force and neighbourhood, filter by category and month,
       then view incidents listed and on an interactive map.
     </p>
 
     <div class="cta">
-      <ion-button 
-      class="btn-discreet" 
-      fill="clear"
-      routerLink="/home"
-      style="border-radius: 20px;"
+      <ion-button
+        class="btn-discreet"
+        fill="clear"
+        routerLink="/home"
+        style="border-radius: 20px;"
       >
         Enter app
-        
       </ion-button>
     </div>
   </main>
 
-  <footer class="credit">
-    © {{ creatorName || 'Jonny' }}
-  </footer>
-
+  <footer class="credit">© {{ creatorName || 'Jonny' }}</footer>
 </ion-content>
