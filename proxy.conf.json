@@ -1,0 +1,8 @@
+{
+  "/police": {
+    "target": "https://data.police.uk",
+    "changeOrigin": true,
+    "secure": true,
+    "pathRewrite": { "^/police": "" }
+  }
+}

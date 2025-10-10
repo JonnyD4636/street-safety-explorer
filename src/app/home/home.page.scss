@@ -1,27 +1,64 @@
-#container {
-  text-align: center;
+.home-screen {
+  .result-row {
+    display: flex;
+    align-items: center;
+    gap: .5rem;
+  }
 
-  position: absolute;
-  left: 0;
-  right: 0;
-  top: 50%;
-  transform: translateY(-50%);
+  .street {
+    margin: 0;
+    font-weight: 600;
+    color: #e7f5f5;
+  }
+
+  .sub {
+    margin: 4px 0 0 0;
+    color: #a9c3c8;
+  }
+
+  .actions {
+    margin-top: 14px;
+  }
+
+  .chips ion-chip {
+    --background: #0e1c22;
+    color: #cfe6e8;
+    border: 1px solid rgba(146,179,185,.18);
+  }
 }
 
-#container strong {
-  font-size: 20px;
-  line-height: 26px;
+.control {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  min-width: 0; 
 }
 
-#container p {
-  font-size: 16px;
-  line-height: 22px;
+.month-btn {
+  --background: transparent;
+  --color: #cfe6e8;
+  --padding-start: 0;
+  --padding-end: 0;
+}
 
-  color: #8c8c8c;
+.month-btn::part(native) {
+  width: 100%;
+  justify-content: flex-start; 
+  padding: 0 0 0 4px; 
+  height: auto;
+  min-height: unset;
+  background: transparent;
+  box-shadow: none;
+  border: 0;
+  color: #cfe6e8;
+  font-weight: 600;
+  text-align: left;
+}
 
+.month-btn::part(datetime-text) {
+  color: #cfe6e8;
+}
+
+ion-item .month-btn {
   margin: 0;
-}
-
-#container a {
-  text-decoration: none;
 }
