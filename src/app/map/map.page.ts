@@ -7,9 +7,9 @@ import { Crime } from '../services/police-api.service';
 import { Router } from '@angular/router';
 
 L.Icon.Default.mergeOptions({
-  iconRetinaUrl: '../assets/leaflet/marker-icon-2x.png',
-  iconUrl: '../assets/leaflet/marker-icon.png',
-  shadowUrl: '../assets/leaflet/marker-shadow.png',
+  iconRetinaUrl: "assets/leaflet/marker-icon-2x.png",
+  iconUrl: "assets/leaflet/marker-icon.png",
+  shadowUrl: "assets/leaflet/marker-shadow.png",
 });
 
 @Component({
