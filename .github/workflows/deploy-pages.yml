@@ -32,17 +32,39 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
-      - name: Build (prod) with correct base-href
+      # Try your project's build script first (Ionic/Nx/etc). If absent/fails, fall back to Angular CLI.
+      - name: Build app (prod)
         run: |
-          npx ng build --configuration production --base-href "/street-safety-explorer/"
+          set -e
+          if npm run -s build -- --configuration production >/dev/null 2>&1; then
+            echo "Built via npm run build"
+          else
+            echo "npm run build unavailable or failed; using Angular CLI fallback"
+            npx -y @angular/cli@latest build --configuration production
+          fi
 
+      # Find the real dist subfolder that contains index.html
       - name: Find dist directory
         id: find_dist
         run: |
-          DIST_DIR=$(ls -d dist/* | head -n1)
+          set -e
+          DIST_DIR=$(find dist -maxdepth 2 -type f -name index.html -print -quit | xargs -I{} dirname {})
+          if [ -z "$DIST_DIR" ]; then
+            echo "No dist/**/index.html found"; exit 1
+          fi
           echo "dist_dir=$DIST_DIR" >> $GITHUB_OUTPUT
           echo "Using dist dir: $DIST_DIR"
 
+      # Ensure correct base-href for GitHub Pages (/street-safety-explorer/)
+      - name: Patch <base href> in index.html
+        run: |
+          set -e
+          INDEX="${{ steps.find_dist.outputs.dist_dir }}/index.html"
+          sed -i 's#<base href="/#<base href="/street-safety-explorer/#' "$INDEX" || true
+          # If it was exactly <base href="/">, handle that too:
+          sed -i 's#<base href="/"#<base href="/street-safety-explorer/"#' "$INDEX" || true
+
+      # Add SPA fallback so deep links refresh correctly on Pages
       - name: Add SPA 404.html
         run: |
           cat > "${{ steps.find_dist.outputs.dist_dir }}/404.html" <<'HTML'
