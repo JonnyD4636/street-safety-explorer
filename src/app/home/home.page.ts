@@ -1,4 +1,3 @@
-// src/app/home/home.page.ts
 import { Component, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
@@ -9,10 +8,10 @@ import {
   Neighbourhood,
   Category,
   Crime,
-  LatLng,
 } from '../services/police-api.service';
 import { Router } from '@angular/router';
 import { MapStateService } from '../services/map-state.service';
+import { finalize, take, timeout } from 'rxjs/operators';
 
 function lastFullMonth(): string {
   const d = new Date();
@@ -39,6 +38,7 @@ export class HomePage implements OnInit {
   neighbourhoods: Neighbourhood[] = [];
   categories: Category[] = [];
   crimes: Crime[] = [];
+  categoryCountsList: { name: string; count: number }[] = [];
 
   loadingForces = false;
   loadingNeighs = false;
@@ -53,35 +53,33 @@ export class HomePage implements OnInit {
   maxMonthIso = `${lastFullMonth()}-01`;
   get monthIsoValue() { return `${this.selectedMonth}-01`; }
 
-  get formattedMonth(): string {
-    try {
-      const [y, m] = this.selectedMonth.split('-').map(Number);
-      const d = new Date(y, m - 1, 1);
-      return d.toLocaleDateString(undefined, { month: 'long', year: 'numeric' });
-    } catch {
-      return this.selectedMonth;
-    }
-  }
-
   ngOnInit() {
     this.loadForces();
     this.loadCategories();
   }
 
+  // ---------- Loads ----------
+
   loadForces() {
     this.loadingForces = true;
-    this.api.getForces().subscribe({
-      next: (data) => { this.forces = data; this.loadingForces = false; },
-      error: () => { this.loadingForces = false; this.showError('Failed to load forces'); }
-    });
+    this.api.getForces()
+      .pipe(take(1), timeout(15000), finalize(() => this.loadingForces = false))
+      .subscribe({
+        next: (data) => { this.forces = Array.isArray(data) ? data : []; },
+        error: (err) => { this.showError((err as any)?.__summary || 'Failed to load forces', (err as any)?.__url, err?.status); }
+      });
   }
 
   loadCategories() {
-    this.api.getCrimeCategories().subscribe({
-      next: (data) => this.categories = data,
-      error: () => this.showError('Failed to load categories')
-    });
+    this.api.getCrimeCategories()
+      .pipe(take(1), timeout(15000))
+      .subscribe({
+        next: (data) => { this.categories = Array.isArray(data) ? data : []; },
+        error: (err) => { this.showError((err as any)?.__summary || 'Failed to load categories', (err as any)?.__url, err?.status); }
+      });
   }
+
+  // ---------- Selections ----------
 
   onForceChange() {
     if (!this.selectedForceId) {
@@ -92,10 +90,13 @@ export class HomePage implements OnInit {
     this.loadingNeighs = true;
     this.selectedNeighbourhoodId = null;
     this.neighbourhoods = [];
-    this.api.getNeighbourhoods(this.selectedForceId).subscribe({
-      next: (data) => { this.neighbourhoods = data; this.loadingNeighs = false; },
-      error: () => { this.loadingNeighs = false; this.showError('Failed to load neighbourhoods'); }
-    });
+
+    this.api.getNeighbourhoods(this.selectedForceId)
+      .pipe(take(1), timeout(15000), finalize(() => this.loadingNeighs = false))
+      .subscribe({
+        next: (data) => { this.neighbourhoods = Array.isArray(data) ? data : []; },
+        error: (err) => { this.showError((err as any)?.__summary || 'Failed to load neighbourhoods', (err as any)?.__url, err?.status); }
+      });
   }
 
   onMonthChange(ev: CustomEvent) {
@@ -108,35 +109,66 @@ export class HomePage implements OnInit {
     this.maxMonthIso = `${lastFullMonth()}-01`;
   }
 
-  async fetchCrimes() {
+  // ---------- Fetch crimes (use neighbourhood centre; no boundary) ----------
+
+  fetchCrimes() {
     if (!this.selectedForceId || !this.selectedNeighbourhoodId) return;
+
     this.loadingCrimes = true;
     this.crimes = [];
+    this.categoryCountsList = [];
 
-    this.api.getNeighbourhoodBoundary(this.selectedForceId, this.selectedNeighbourhoodId).subscribe({
-      next: (boundary) => {
-        if (!boundary?.length) {
+    // Get neighbourhood details (includes centre {lat, lng})
+    this.api.getNeighbourhoodDetails(this.selectedForceId, this.selectedNeighbourhoodId)
+      .pipe(take(1), timeout(15000))
+      .subscribe({
+        next: (details) => {
+          const lat = parseFloat(details?.centre?.latitude ?? '');
+          const lng = parseFloat(details?.centre?.longitude ?? '');
+          if (!Number.isFinite(lat) || !Number.isFinite(lng)) {
+            this.loadingCrimes = false;
+            this.showError('No centre coordinates available for this neighbourhood.');
+            return;
+          }
+
+          this.api.getCrimesByLatLng(lat, lng, this.selectedMonth, this.selectedCategory)
+            .pipe(take(1), timeout(20000), finalize(() => this.loadingCrimes = false))
+            .subscribe({
+              next: (crimes) => {
+                this.crimes = (crimes ?? []).filter(c => !!c?.location?.latitude && !!c?.location?.longitude);
+                this.categoryCountsList = this.buildCounts(this.crimes);
+              },
+              error: (err) => {
+                this.showError((err as any)?.__summary || 'Failed to load crimes', (err as any)?.__url, err?.status);
+              }
+            });
+        },
+        error: (err) => {
           this.loadingCrimes = false;
-          this.showError('No boundary data available');
-          return;
+          this.showError((err as any)?.__summary || 'Failed to load neighbourhood details', (err as any)?.__url, err?.status);
         }
-        const { lat, lng } = this.centroid(boundary);
-        this.api.getCrimesByLatLng(lat, lng, this.selectedMonth, this.selectedCategory).subscribe({
-          next: (crimes: Crime[]) => { this.crimes = crimes; this.loadingCrimes = false; },
-          error: () => { this.loadingCrimes = false; this.showError('Failed to load crimes'); }
-        });
-      },
-      error: () => { this.loadingCrimes = false; this.showError('Failed to get neighbourhood boundary'); }
-    });
+      });
   }
 
-  async openMap() {
+  openMap() {
     if (!this.crimes.length) return;
     this.mapState.setCrimes(this.crimes);
     setTimeout(() => this.router.navigateByUrl('/map'), 0);
   }
 
-  /* ---------- UI helpers ---------- */
+  // ---------- Utils ----------
+
+  private buildCounts(items: Crime[]): { name: string; count: number }[] {
+    const map = new Map<string, number>();
+    for (const c of items ?? []) {
+      const k = (c?.category ?? 'Unknown').toString();
+      map.set(k, (map.get(k) || 0) + 1);
+    }
+    return Array.from(map.entries())
+      .map(([name, count]) => ({ name, count }))
+      .sort((a, b) => b.count - a.count)
+      .slice(0, 8);
+  }
 
   getCategoryColor(category: string): string {
     const c = (category || '').toLowerCase();
@@ -149,42 +181,13 @@ export class HomePage implements OnInit {
     return 'dark';
   }
 
-  get categoryCounts(): { name: string; count: number }[] {
-    const map = new Map<string, number>();
-    for (const c of this.crimes) {
-      const key = (c?.category ?? 'Unknown').toString();
-      map.set(key, (map.get(key) || 0) + 1);
-    }
-    return Array.from(map.entries())
-      .map(([name, count]) => ({ name, count }))
-      .sort((a, b) => b.count - a.count)
-      .slice(0, 8);
-  }
-
-  /** Safe street name extractor to satisfy strict template typing without changing behavior */
   streetName(c: Crime): string {
-    return (c && (c as any).location && (c as any).location.street && (c as any).location.street.name)
-      ? (c as any).location.street.name
-      : '';
+    return (c as any)?.location?.street?.name ?? '';
   }
 
-  /* ---------- Utils ---------- */
-
-  private centroid(points: LatLng[]): { lat: number; lng: number } {
-    const n = points.length;
-    const sum = points.reduce(
-      (acc, p) => {
-        acc.lat += parseFloat(p.latitude as unknown as string);
-        acc.lng += parseFloat(p.longitude as unknown as string);
-        return acc;
-      },
-      { lat: 0, lng: 0 }
-    );
-    return { lat: sum.lat / n, lng: sum.lng / n };
-  }
-
-  private async showError(message: string) {
-    const t = await this.toast.create({ message, duration: 2500, color: 'danger' });
+  private async showError(message: string, url?: string, status?: number) {
+    const text = url ? `${message}\n${url}${typeof status === 'number' ? ` (status ${status})` : ''}` : message;
+    const t = await this.toast.create({ message: text, duration: 4000, color: 'danger', cssClass: 'text-left' });
     await t.present();
   }
 }

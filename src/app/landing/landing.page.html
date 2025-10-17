@@ -1,30 +1,11 @@
-<ion-content class="landing tactical" fullscreen>
+<ion-content class="landing" fullscreen>
   <main class="hero">
-    <img
-      src="assets/logo.png"
-      alt="Street Safety Explorer"
-      class="logo-main"
-      decoding="async"
-      fetchpriority="high"
-    />
-    <h1 class="title">Street Safety Explorer</h1>
-    <h2 class="subtitle">Explore official UK Police data</h2>
+    <img src="assets/logo.png" alt="Street Safety Explorer" class="logo-main" decoding="async" fetchpriority="high" />
     <p class="blurb">
-      Select a police force and neighbourhood, filter by category and month,
-      then view incidents listed and on an interactive map.
+      Discover how safe your streets are. Street Safety Explorer brings together official UK Police data so you can
+      explore crime trends and neighbourhood safety with ease.
     </p>
-
-    <div class="cta">
-      <ion-button
-        class="btn-discreet"
-        fill="clear"
-        routerLink="/home"
-        style="border-radius: 20px;"
-      >
-        Enter app
-      </ion-button>
-    </div>
+    <ion-button routerLink="/home" class="enter-btn" fill="solid" size="default">Enter app</ion-button>
   </main>
-
-  <footer class="credit">© {{ creatorName || 'Jonny' }}</footer>
+  <footer class="credit">Created by <strong>Jonny D.</strong></footer>
 </ion-content>

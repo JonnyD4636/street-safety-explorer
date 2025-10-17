@@ -3,18 +3,13 @@
   --brand-teal-600: #22b3ad;
   --brand-teal-700: #1aa099;
 
-  --slate-950: #0f1b22;
-  --slate-900: #13242f;
-  --slate-800: #163140;
-  --slate-200: #e6eef1;
-  --slate-100: #f2f7f9;
-  --white: #ffffff;
+  --slate-950: #0b161b;
+  --slate-900: #0f1f26;
+  --slate-800: #112730;
 
-  --brand-font: 'Inter', system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif;
-}
+  --white: #fff;
 
-:root {
-  --ion-font-family: var(--brand-font);
+  --ion-font-family: 'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
 
   --ion-color-primary: var(--brand-teal);
   --ion-color-primary-rgb: 47,208,201;
@@ -23,25 +18,13 @@
   --ion-color-primary-shade: var(--brand-teal-700);
   --ion-color-primary-tint: var(--brand-teal-600);
 
-  --ion-color-success: #16a34a;
-  --ion-color-warning: #f59e0b;
-  --ion-color-danger:  #ef4444;
-
-  --ion-background-color: #f7fbfc;
-  --ion-text-color: #0f1b22;
-
-  --card-bg: var(--white);
-  --card-border: var(--slate-200);
-  --card-shadow: 0 2px 12px rgba(3,27,39,.08);
+  --ion-background-color: var(--slate-950);
+  --ion-text-color: #e7f5f5;
 }
 
-@media (prefers-color-scheme: dark) {
+@media (prefers-color-scheme: light) {
   :root {
-    --ion-background-color: var(--slate-900);
-    --ion-text-color: #eaf2f5;
-
-    --card-bg: #10222b;
-    --card-border: #1e3a4a;
-    --card-shadow: 0 4px 18px rgba(0,0,0,.35);
+    --ion-background-color: #f7fbfc;
+    --ion-text-color: #0f1b22;
   }
 }

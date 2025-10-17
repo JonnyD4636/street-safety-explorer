@@ -6,58 +6,41 @@
 
 <ion-content class="home-screen">
   <div class="container">
-
-    <!-- Filters card -->
-    <div class="card ion-padding" style="margin-top:16px;">
-      <!-- Force -->
+    <div class="card ion-padding mt-16">
       <ion-item>
         <ion-label>Force</ion-label>
         <ion-select
           placeholder="Select force"
           [(ngModel)]="selectedForceId"
           (ionChange)="onForceChange()"
-          interface="popover">
-          <ion-select-option *ngFor="let f of forces" [value]="f.id">
-            {{ f.name }}
-          </ion-select-option>
+          interface="alert">
+          <ion-select-option *ngFor="let f of forces" [value]="f.id">{{ f.name }}</ion-select-option>
         </ion-select>
       </ion-item>
 
-      <!-- Neighbourhood -->
       <ion-item *ngIf="selectedForceId">
         <ion-label>Neighbourhood</ion-label>
         <ion-select
           placeholder="Select neighbourhood"
           [(ngModel)]="selectedNeighbourhoodId"
-          interface="popover">
-          <ion-select-option *ngFor="let n of neighbourhoods" [value]="n.id">
-            {{ n.name }}
-          </ion-select-option>
+          interface="alert">
+          <ion-select-option *ngFor="let n of neighbourhoods" [value]="n.id">{{ n.name }}</ion-select-option>
         </ion-select>
       </ion-item>
 
-      <!-- Category -->
       <ion-item *ngIf="selectedNeighbourhoodId">
         <ion-label>Category</ion-label>
-        <ion-select [(ngModel)]="selectedCategory" interface="popover">
+        <ion-select [(ngModel)]="selectedCategory" interface="alert">
           <ion-select-option value="all-crime">All crime</ion-select-option>
-          <ion-select-option *ngFor="let c of categories" [value]="c.url">
-            {{ c.name }}
-          </ion-select-option>
+          <ion-select-option *ngFor="let c of categories" [value]="c.url">{{ c.name }}</ion-select-option>
         </ion-select>
       </ion-item>
 
-      <!-- Month -->
       <ion-item *ngIf="selectedNeighbourhoodId">
         <ion-label>Month</ion-label>
-        <ion-datetime-button
-          class="month-btn"
-          datetime="monthPicker"
-          aria-label="Choose month">
-        </ion-datetime-button>
+        <ion-datetime-button class="month-btn" datetime="monthPicker" aria-label="Choose month"></ion-datetime-button>
       </ion-item>
 
-      <!-- Datetime modal host -->
       <ion-modal [keepContentsMounted]="true">
         <ng-template>
           <ion-datetime
@@ -72,39 +55,30 @@
       </ion-modal>
 
       <div class="actions">
-        <ion-button
-          class="btn-outline"
-          (click)="fetchCrimes()"
-          [disabled]="!selectedNeighbourhoodId || !selectedMonth">
+        <ion-button class="btn-outline" (click)="fetchCrimes()" [disabled]="!selectedNeighbourhoodId || !selectedMonth">
           Fetch crimes
         </ion-button>
       </div>
     </div>
 
-    <!-- Loading -->
     <ion-loading [isOpen]="loadingCrimes" message="Fetching crimes..."></ion-loading>
 
-    <!-- Results card -->
-    <div class="card ion-padding" *ngIf="!loadingCrimes && crimes.length" style="margin-top:16px;">
+    <div class="card ion-padding mt-16" *ngIf="!loadingCrimes && crimes.length">
       <ion-text><b>{{ crimes.length }}</b> crimes found.</ion-text>
 
-      <!-- Category distribution -->
       <div class="ion-margin-vertical chips">
-        <ion-chip *ngFor="let cc of categoryCounts" [color]="getCategoryColor(cc.name)">
+        <ion-chip *ngFor="let cc of categoryCountsList" [color]="getCategoryColor(cc.name)">
           <ion-label>{{ cc.name | titlecase }} ({{ cc.count }})</ion-label>
         </ion-chip>
       </div>
 
-      <ion-button expand="block" class="btn-outline ion-margin-bottom" (click)="openMap()">
-        View Map
-      </ion-button>
+      <ion-button expand="block" class="btn-outline ion-margin-bottom" (click)="openMap()">View Map</ion-button>
 
-      <ion-list>
-        <ion-item *ngFor="let c of crimes | slice:0:30">
-          <ion-label>
-            <div class="result-row">
+        <ion-list style="background: transparent; padding-bottom: 10px;">
+        <ion-item style=" border-radius: 20px; margin: 0; padding: 0px;" *ngFor="let c of crimes | slice:0:30">
+          <ion-label >
+            <div class="result-row" >
               <ion-chip size="small">{{ c.category | titlecase }}</ion-chip>
-              <!-- CHANGED: use helper to satisfy strict typing -->
               <h3 class="street">{{ streetName(c) }}</h3>
             </div>
             <p class="sub">
@@ -115,14 +89,11 @@
         </ion-item>
       </ion-list>
 
-      <ion-note *ngIf="crimes.length > 30">
-        Showing first 30. Refine filters to narrow results.
-      </ion-note>
+      <ion-note *ngIf="crimes.length > 30">Showing first 30. Refine filters to narrow results.</ion-note>
     </div>
 
     <ion-note *ngIf="!loadingCrimes && selectedNeighbourhoodId && !crimes.length" class="ion-margin-top">
       No crimes found for this selection.
     </ion-note>
-
   </div>
 </ion-content>

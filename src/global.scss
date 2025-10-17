@@ -1,60 +1,38 @@
-/* Core CSS required for Ionic components */
 @import "@ionic/angular/css/core.css";
-
-/* Basic CSS for apps built with Ionic */
 @import "@ionic/angular/css/normalize.css";
 @import "@ionic/angular/css/structure.css";
 @import "@ionic/angular/css/typography.css";
 @import "@ionic/angular/css/display.css";
-
-/* Optional utilities */
 @import "@ionic/angular/css/padding.css";
 @import "@ionic/angular/css/float-elements.css";
 @import "@ionic/angular/css/text-alignment.css";
 @import "@ionic/angular/css/text-transformation.css";
 @import "@ionic/angular/css/flex-utils.css";
-
-/* Dark palette (system) */
 @import "@ionic/angular/css/palettes/dark.system.css";
-
-/* Leaflet (map) */
 @import "leaflet/dist/leaflet.css";
 
-/* ------------------------------
-   Global base (unified)
------------------------------- */
+html, body, ion-app, app-root, ion-router-outlet { height: 100%; }
+* { box-sizing: border-box; }
 
-:root { --app-bg: #0b161b; }
-
-html, body {
-  background: #0b161b;
-  margin: 0;
-  color: #e7f5f5;
-}
-
-/* Subtle gradient + faint grid */
 body {
-  background:
-    radial-gradient(1200px 800px at 50% -200px, rgba(46,199,191,.08), rgba(11,22,27,0) 60%),
-    linear-gradient(to bottom, #0f1f26 0%, #0b161b 40%, #0b161b 100%);
+  margin: 0;
+  font-family: var(--ion-font-family);
+  color: var(--ion-text-color);
+  background: var(--ion-background-color);
 }
+
 body::before {
   content: "";
   position: fixed;
   inset: 0;
+  z-index: -1;
   pointer-events: none;
-  background-image:
-    linear-gradient(rgba(146,179,185,.05) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(146,179,185,.05) 1px, transparent 1px);
-  background-size: 40px 40px;
-  opacity: .12;
-  z-index: 0;
+  background:
+    radial-gradient(1200px 800px at 50% -200px, rgba(46,199,191,.08), rgba(11,22,27,0) 60%),
+    linear-gradient(to bottom, #0f1f26 0%, #0b161b 40%, #0b161b 100%);
 }
 
-/* Transparent chrome – we paint backgrounds ourselves */
-ion-content,
-ion-header,
-ion-toolbar {
+ion-content, ion-header, ion-toolbar {
   --background: transparent;
   background: transparent;
 }
@@ -64,46 +42,33 @@ ion-toolbar {
   border-bottom: 0;
 }
 
-/* Utility */
-.container {
-  max-width: 1040px;
-  margin: 0 auto;
-  padding: 0 16px;
-}
+.container { max-width: 1040px; margin: 0 auto; padding: 0 16px; }
 
-/* Buttons & cards */
-.btn-primary {
-  --background: var(--ion-color-primary);
-  --box-shadow: 0 8px 24px rgba(47, 208, 201, 0.28);
+.card, .surface, .glass-card {
+  background: rgba(255,255,255,0.04);
+  border: 1px solid rgba(255,255,255,0.08);
+  border-radius: 14px;
+  box-shadow: 0 8px 30px rgba(0,0,0,0.3);
+  backdrop-filter: blur(6px);
 }
-ion-button.btn-primary:hover { filter: brightness(1.05); }
 
 .btn-outline {
   --background: transparent;
-  --border-color: rgba(47,208,201,.55);
   --color: var(--ion-color-primary);
-  border: 1px solid var(--ion-color-primary);
+  border: 1px solid rgba(47,208,201,.55);
 }
 
-.glass-card,
-.card,
-.surface {
-  background: rgba(255,255,255,0.03);
-  border: 1px solid rgba(255,255,255,0.06);
-  border-radius: 16px;
-  box-shadow: 0 8px 40px rgba(0,0,0,0.35);
-  backdrop-filter: blur(8px);
-}
-
-/* Items & popovers */
 ion-item {
-  --background: rgba(255,255,255,0.02);
+  --background: rgba(255,255,255,0.03);
   --border-color: rgba(255,255,255,0.08);
-  --color: #e7f5f5;
+  --color: var(--ion-text-color);
   border-radius: 12px;
   margin: 8px 0;
 }
-ion-select, ion-input, ion-datetime-button { --color: #e7f5f5; }
+
+ion-select,
+ion-input,
+ion-datetime-button { --color: var(--ion-text-color); }
 
 ion-chip {
   --background: #0e1c22;
@@ -111,43 +76,98 @@ ion-chip {
   border: 1px solid rgba(146,179,185,.18);
 }
 
-/* Tactical theme hooks */
-.tactical-app ion-app,
-.tactical-app ion-content {
-  background: #0b161b !important;
-  color: #e7f5f5;
-}
+.leaflet-pane.leaflet-marker-pane img { image-rendering: auto; }
+#map, .map-page, app-map { height: 100%; }
 
+.tactical-app ion-content { color: #e7f5f5; }
 .tactical-app ion-toolbar {
   --background: #0f1f26;
   --color: #e7f5f5;
-  border-bottom: 1px solid rgba(146, 179, 185, 0.12);
+  box-shadow: inset 0 -1px 0 rgba(146,179,185,.12);
 }
 
-.tactical-app ion-list { background: transparent; }
-
-.tactical-app ion-popover::part(content) {
+ion-alert::part(content) {
   background: #0f2127;
-  border: 1px solid rgba(146, 179, 185, 0.14);
+  color: #e7f5f5;
+  border: 1px solid rgba(146,179,185,.14);
   border-radius: 12px;
-  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.45);
-  min-width: 260px;
+  box-shadow: 0 16px 40px rgba(0,0,0,.45);
 }
-.tactical-app ion-select-popover ion-list { background: transparent; padding: 6px; }
-.tactical-app ion-select-popover ion-item {
+ion-alert::part(header) { color: #cfe6e8; }
+ion-alert::part(message) { color: #a9c3c8; }
+ion-alert .alert-radio-group .alert-radio-button { color: #e7f5f5; }
+ion-alert .alert-radio-group .alert-radio-button .alert-radio-label { color: #e7f5f5; opacity: 1; }
+ion-alert .alert-radio-group .alert-radio-button[aria-checked="true"],
+ion-alert .alert-radio-group .alert-radio-button[aria-selected="true"],
+ion-alert .alert-radio-group .alert-radio-button:hover { background: #0e1c22; }
+ion-alert .alert-radio-group .alert-radio-button[aria-checked="true"] .alert-radio-label,
+ion-alert .alert-radio-group .alert-radio-button[aria-selected="true"] .alert-radio-label,
+ion-alert .alert-radio-group .alert-radio-button:hover .alert-radio-label { color: #f2f5e7; opacity: 1; }
+ion-alert::part(button) { color: #2fd0c9; }
+ion-alert::part(button):hover { background: rgba(47,208,201,.08); }
+
+/* Optional: if you ever switch a select back to popover */
+ion-popover::part(content) {
+  background: #0f2127;
+  color: #e7f5f5;
+  border: 1px solid rgba(146,179,185,.14);
+  border-radius: 12px;
+  box-shadow: 0 16px 40px rgba(0,0,0,.45);
+  min-width: 280px;
+}
+ion-popover::part(backdrop) { background: rgba(0,0,0,.6); opacity: 1; }
+ion-select-popover ion-item {
   --background: transparent;
   --color: #e7f5f5;
   --padding-start: 12px;
   --padding-end: 12px;
-  --min-height: 40px;
+  --min-height: 42px;
   border-radius: 8px;
-  margin: 2px 0;
-  border: 1px solid transparent;
+  margin: 2px 6px;
 }
-.tactical-app ion-select-popover ion-item:hover {
-  background: #102a31;
-  border-color: rgba(146, 179, 185, 0.2);
-}
-.tactical-app ion-select-popover ion-radio { --color-checked: var(--ion-color-primary); }
+ion-select-popover ion-item:hover { background: #102a31; border: 1px solid rgba(127,247,240,.22); }
+ion-select-popover ion-item[aria-checked="true"] { background: #0e1c22; border: 1px solid rgba(127,247,240,.25); }
+ion-select-popover ion-label { color: #e7f5f5 !important; }
+ion-select-popover ion-radio::part(container) { border-color: #7ff7f0; }
+ion-select-popover ion-radio::part(mark) { background: #2fd0c9; }
 
-/* Landing background grid (scoped to that page via :host selectors in page SCSS) */
+ion-alert {
+  --background: #0f2127;
+  --ion-background-color: #0f2127;  
+  --color: #e7f5f5;
+  --ion-text-color: #e7f5f5;
+  --button-color: #2fd0c9;
+  --backdrop-opacity: .6;
+}
+
+ion-alert::part(content) {
+  background: #0f2127;
+  color: #e7f5f5;
+  border: 1px solid rgba(146,179,185,.14);
+  border-radius: 12px;
+  box-shadow: 0 16px 40px rgba(0,0,0,.45);
+}
+
+/* Remove Ionic's dimming and force readable labels */
+ion-alert .alert-radio-label {
+  color: #e7f5f5 !important;
+  opacity: 1 !important;
+}
+
+/* Row states */
+ion-alert .alert-radio-group .alert-radio-button {
+  color: #e7f5f5;
+}
+ion-alert .alert-radio-group .alert-radio-button:hover,
+ion-alert .alert-radio-group .alert-radio-button[aria-checked="true"] {
+  background: #0e1c22;
+  border-top: 1px solid rgba(127,247,240,.18);
+  border-bottom: 1px solid rgba(127,247,240,.18);
+}
+
+ion-alert .alert-radio-icon {
+  border-color: #7ff7f0;        
+}
+ion-alert .alert-radio-inner {
+  background: #2fd0c9;          
+}

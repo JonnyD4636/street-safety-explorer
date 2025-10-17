@@ -1,32 +1,42 @@
-.home-screen {
-  .result-row {
-    display: flex;
-    align-items: center;
-    gap: .5rem;
-  }
-  .street {
-    margin: 0;
-    font-weight: 600;
-    color: #e7f5f5;
-  }
-  .sub {
-    margin: 4px 0 0 0;
-    color: #a9c3c8;
-  }
-  .actions { margin-top: 14px; }
+:host { display: block; }
 
-  .chips ion-chip {
-    --background: #0e1c22;
-    color: #cfe6e8;
-    border: 1px solid rgba(146,179,185,.18);
-  }
+.mt-16 { margin-top: 16px; }
+
+.home-screen .card {
+  background: #0f2127;
+  border: 1px solid rgba(146, 179, 185, 0.14);
+  border-radius: 14px;
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.28);
 }
 
-.control {
-  flex: 1;
+ion-item {
+  --background: #0f2127;
+  --border-color: ç;
+  --color: #e7f5f5;
+  border-radius: 10px;
+  margin: 8px 0;
+}
+
+ion-select,
+ion-input,
+ion-datetime-button {
+  --color: #e7f5f5;
+}
+
+.result-row {
   display: flex;
   align-items: center;
-  min-width: 0;
+  gap: .5rem;
+}
+
+.street { margin: 0; font-weight: 600; }
+.sub { margin: 4px 0 0 0; opacity: .8; }
+.actions { margin-top: 14px; }
+
+.chips ion-chip {
+  --background: #0e1c22;
+  color: #cfe6e8;
+  border: 1px solid rgba(146,179,185,.18);
 }
 
 .month-btn {
@@ -35,13 +45,11 @@
   --padding-start: 0;
   --padding-end: 0;
 }
-
 .month-btn::part(native) {
   width: 100%;
   justify-content: flex-start;
   padding: 0 0 0 4px;
   height: auto;
-  min-height: unset;
   background: transparent;
   box-shadow: none;
   border: 0;
@@ -50,5 +58,3 @@
   text-align: left;
 }
 .month-btn::part(datetime-text) { color: #cfe6e8; }
-
-ion-item .month-btn { margin: 0; }

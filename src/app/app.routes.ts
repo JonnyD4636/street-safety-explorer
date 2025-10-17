@@ -1,21 +1,11 @@
 import { Routes } from '@angular/router';
+import { HomePage } from './home/home.page';
+import { MapPage } from './map/map.page';
+import { LandingPage } from './landing/landing.page';
 
 export const routes: Routes = [
-  {
-    path: 'home',
-    loadComponent: () => import('./home/home.page').then(m => m.HomePage),
-  },
-  {
-    path: 'map',
-    loadComponent: () => import('./map/map.page').then(m => m.MapPage),
-  },
-  {
-    path: 'landing',
-    loadComponent: () => import('./landing/landing.page').then(m => m.LandingPage),
-  },
-  {
-    path: '',
-    redirectTo: 'landing',
-    pathMatch: 'full',
-  },
+  { path: 'home', component: HomePage },
+  { path: 'map', component: MapPage },
+  { path: 'landing', component: LandingPage },
+  { path: '', redirectTo: 'landing', pathMatch: 'full' },
 ];
