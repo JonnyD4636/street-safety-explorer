@@ -17,6 +17,8 @@ concurrency:
 jobs:
   build:
     runs-on: ubuntu-latest
+    outputs:
+      dist_dir: ${{ steps.find_dist.outputs.dist_dir }}
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -33,17 +35,26 @@ jobs:
       - name: Build (prod) with correct base-href
         run: |
           npx ng build --configuration production --base-href "/street-safety-explorer/"
+
+      - name: Find dist directory
+        id: find_dist
+        run: |
           DIST_DIR=$(ls -d dist/* | head -n1)
-          cp <<'HTML' "$DIST_DIR/404.html"
+          echo "dist_dir=$DIST_DIR" >> $GITHUB_OUTPUT
+          echo "Using dist dir: $DIST_DIR"
+
+      - name: Add SPA 404.html
+        run: |
+          cat > "${{ steps.find_dist.outputs.dist_dir }}/404.html" <<'HTML'
           <!doctype html><meta charset="utf-8"><title>Redirecting…</title><script>
           var l=window.location;var b=l.protocol+'//'+l.host+l.pathname.replace(/\/[^/]*$/,'/');l.replace(b+'index.html');
           </script>
           HTML
 
-      - name: Upload artifact
+      - name: Upload artifact (dist subfolder)
         uses: actions/upload-pages-artifact@v3
         with:
-          path: dist
+          path: ${{ steps.find_dist.outputs.dist_dir }}
 
   deploy:
     environment:
