@@ -1,4 +1,4 @@
-name: Deploy to GitHub Pages
+name: Deploy to GitHub Pages (gh-pages branch)
 
 on:
   push:
@@ -6,19 +6,11 @@ on:
   workflow_dispatch:
 
 permissions:
-  contents: read
-  pages: write
-  id-token: write
-
-concurrency:
-  group: "pages"
-  cancel-in-progress: true
+  contents: write
 
 jobs:
-  build:
+  build-and-deploy:
     runs-on: ubuntu-latest
-    outputs:
-      dist_dir: ${{ steps.find_dist.outputs.dist_dir }}
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -29,42 +21,40 @@ jobs:
           node-version: 20
           cache: 'npm'
 
-      - name: Install dependencies
+      - name: Install deps
         run: npm ci
 
-      # Try your project's build script first (Ionic/Nx/etc). If absent/fails, fall back to Angular CLI.
-      - name: Build app (prod)
+      - name: Build app (try npm/ionic/ng)
         run: |
-          set -e
-          if npm run -s build -- --configuration production >/dev/null 2>&1; then
+          set -euxo pipefail
+          # 1) Try project build script
+          if npm run -s build -- --configuration production; then
             echo "Built via npm run build"
+          # 2) Try Ionic
+          elif npx -y ionic@latest build --prod; then
+            echo "Built via ionic build"
+          # 3) Fallback: Angular CLI
           else
-            echo "npm run build unavailable or failed; using Angular CLI fallback"
             npx -y @angular/cli@latest build --configuration production
           fi
 
-      # Find the real dist subfolder that contains index.html
-      - name: Find dist directory
+      - name: Find dist dir (the one with index.html)
         id: find_dist
         run: |
           set -e
-          DIST_DIR=$(find dist -maxdepth 2 -type f -name index.html -print -quit | xargs -I{} dirname {})
+          DIST_DIR=$(find dist -type f -name index.html -print -quit | xargs -I{} dirname {})
           if [ -z "$DIST_DIR" ]; then
             echo "No dist/**/index.html found"; exit 1
           fi
           echo "dist_dir=$DIST_DIR" >> $GITHUB_OUTPUT
           echo "Using dist dir: $DIST_DIR"
 
-      # Ensure correct base-href for GitHub Pages (/street-safety-explorer/)
-      - name: Patch <base href> in index.html
+      - name: Patch <base href> for GitHub Pages (/street-safety-explorer/)
         run: |
-          set -e
           INDEX="${{ steps.find_dist.outputs.dist_dir }}/index.html"
           sed -i 's#<base href="/#<base href="/street-safety-explorer/#' "$INDEX" || true
-          # If it was exactly <base href="/">, handle that too:
           sed -i 's#<base href="/"#<base href="/street-safety-explorer/"#' "$INDEX" || true
 
-      # Add SPA fallback so deep links refresh correctly on Pages
       - name: Add SPA 404.html
         run: |
           cat > "${{ steps.find_dist.outputs.dist_dir }}/404.html" <<'HTML'
@@ -73,18 +63,10 @@ jobs:
           </script>
           HTML
 
-      - name: Upload artifact (dist subfolder)
-        uses: actions/upload-pages-artifact@v3
+      - name: Deploy to gh-pages
+        uses: peaceiris/actions-gh-pages@v4
         with:
-          path: ${{ steps.find_dist.outputs.dist_dir }}
-
-  deploy:
-    environment:
-      name: github-pages
-      url: ${{ steps.deployment.outputs.page_url }}
-    needs: build
-    runs-on: ubuntu-latest
-    steps:
-      - name: Deploy to GitHub Pages
-        id: deployment
-        uses: actions/deploy-pages@v4
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ${{ steps.find_dist.outputs.dist_dir }}
+          publish_branch: gh-pages
+          force_orphan: true
