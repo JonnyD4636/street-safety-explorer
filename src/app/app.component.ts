@@ -8,7 +8,6 @@ import { IonApp, IonRouterOutlet } from '@ionic/angular/standalone';
 })
 export class AppComponent implements OnInit {
   ngOnInit(): void {
-    // Theme class only on body to avoid interfering with Ionic host elements.
     document.body.classList.add('tactical-app');
   }
 }

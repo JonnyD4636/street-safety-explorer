@@ -106,7 +106,6 @@ ion-alert .alert-radio-group .alert-radio-button:hover .alert-radio-label { colo
 ion-alert::part(button) { color: #2fd0c9; }
 ion-alert::part(button):hover { background: rgba(47,208,201,.08); }
 
-/* Optional: if you ever switch a select back to popover */
 ion-popover::part(content) {
   background: #0f2127;
   color: #e7f5f5;
@@ -148,13 +147,11 @@ ion-alert::part(content) {
   box-shadow: 0 16px 40px rgba(0,0,0,.45);
 }
 
-/* Remove Ionic's dimming and force readable labels */
 ion-alert .alert-radio-label {
   color: #e7f5f5 !important;
   opacity: 1 !important;
 }
 
-/* Row states */
 ion-alert .alert-radio-group .alert-radio-button {
   color: #e7f5f5;
 }

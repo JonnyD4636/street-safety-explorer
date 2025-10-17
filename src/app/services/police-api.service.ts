@@ -1,4 +1,3 @@
-// src/app/services/police-api.service.ts
 import { Injectable, inject } from '@angular/core';
 import { HttpClient, HttpParams, HttpHeaders, HttpResponse } from '@angular/common/http';
 import { environment } from '../../environments/environment';
@@ -23,7 +22,7 @@ export interface Crime {
 @Injectable({ providedIn: 'root' })
 export class PoliceApiService {
   private http = inject(HttpClient);
-  private readonly base = environment.apiBase; // 'https://data.police.uk/api'
+  private readonly base = environment.apiBase; 
   private readonly jsonHeaders = new HttpHeaders({ 'Accept': 'application/json' });
 
   private label(code?: number): string {
@@ -59,36 +58,32 @@ export class PoliceApiService {
     );
   }
 
-  // ---- Forces
   getForces(): Observable<Force[]> {
     const url = `${this.base}/forces`;
     return this.unwrap(this.http.get<Force[]>(url, { headers: this.jsonHeaders, observe: 'response' }), url);
   }
 
-  // ---- Neighbourhoods (list)
   getNeighbourhoods(forceId: string): Observable<Neighbourhood[]> {
     const url = `${this.base}/${encodeURIComponent(forceId)}/neighbourhoods`;
     return this.unwrap(this.http.get<Neighbourhood[]>(url, { headers: this.jsonHeaders, observe: 'response' }), url);
   }
 
-  // ---- Neighbourhood details (centre coords)  ← NEW
   getNeighbourhoodDetails(forceId: string, neighbourhoodId: string): Observable<{
     id: string;
     name: string;
     centre?: { latitude: string; longitude: string };
-    // other fields exist but we don't need them now
   }> {
     const url = `${this.base}/${encodeURIComponent(forceId)}/${encodeURIComponent(neighbourhoodId)}`;
     return this.unwrap(this.http.get<any>(url, { headers: this.jsonHeaders, observe: 'response' }), url);
   }
 
-  // (We keep boundary function in case you still use it elsewhere)
+
   getNeighbourhoodBoundary(forceId: string, neighbourhoodId: string): Observable<LatLng[]> {
     const url = `${this.base}/${encodeURIComponent(forceId)}/${encodeURIComponent(neighbourhoodId)}/boundary`;
     return this.unwrap(this.http.get<LatLng[]>(url, { headers: this.jsonHeaders, observe: 'response' }), url);
   }
 
-  // ---- Categories
+
   getCrimeCategories(date?: string): Observable<Category[]> {
     const url = `${this.base}/crime-categories`;
     const params = date ? new HttpParams().set('date', date) : undefined;
@@ -98,7 +93,7 @@ export class PoliceApiService {
     );
   }
 
-  // ---- Crimes
+
   getCrimesByLatLng(lat: number, lng: number, month: string, category = 'all-crime'): Observable<Crime[]> {
     const url = `${this.base}/crimes-street/${encodeURIComponent(category)}`;
     const params = new HttpParams().set('lat', String(lat)).set('lng', String(lng)).set('date', month);
